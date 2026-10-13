@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, Pressable } from "react-native";
+import { StyleSheet, View, Text, Pressable, ScrollView } from "react-native";
 
 // Type definition for a square value: "X", "O", or null (empty)
 type SquareValue = "X" | "O" | null;
 
-// Props for each Square component
+// Props for Square
 interface SquareProps {
   value: SquareValue;
   onSquareClick: () => void;
 }
 
-// Beginner-friendly Square component:
-// Replaces web <button className="square"> with React Native <Pressable>
-// Text inside must be wrapped in <Text>
+// Beginner-friendly Square component
 function Square({ value, onSquareClick }: SquareProps) {
   return (
     <Pressable style={styles.square} onPress={onSquareClick}>
@@ -21,7 +19,7 @@ function Square({ value, onSquareClick }: SquareProps) {
   );
 }
 
-// Helper function to determine the winner of the game
+// Helper function to calculate the winner
 function calculateWinner(squares: SquareValue[]): SquareValue {
   const lines = [
     [0, 1, 2], // rows
@@ -44,18 +42,20 @@ function calculateWinner(squares: SquareValue[]): SquareValue {
   return null;
 }
 
-// Checkpoint 2: Plays a full game with turns, no overwriting, and a winner declared
-export default function Board() {
-  const [xIsNext, setXIsNext] = useState<boolean>(true);
-  const [squares, setSquares] = useState<SquareValue[]>(Array(9).fill(null));
+// Props for Board
+interface BoardProps {
+  xIsNext: boolean;
+  squares: SquareValue[];
+  onPlay: (nextSquares: SquareValue[]) => void;
+}
 
+// Board component: displays status and 3x3 grid
+function Board({ xIsNext, squares, onPlay }: BoardProps) {
   function handleClick(i: number) {
-    // If the square is already filled or a player has won, ignore the click
     if (squares[i] || calculateWinner(squares)) {
       return;
     }
 
-    // Create a copy of the squares array (immutability)
     const nextSquares = squares.slice();
     if (xIsNext) {
       nextSquares[i] = "X";
@@ -63,8 +63,7 @@ export default function Board() {
       nextSquares[i] = "O";
     }
 
-    setSquares(nextSquares);
-    setXIsNext(!xIsNext);
+    onPlay(nextSquares);
   }
 
   const winner = calculateWinner(squares);
@@ -76,8 +75,7 @@ export default function Board() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tic-Tac-Toe</Text>
+    <View style={styles.boardContainer}>
       <Text style={styles.status}>{status}</Text>
 
       {/* Row 1 */}
@@ -104,24 +102,81 @@ export default function Board() {
   );
 }
 
+// Checkpoint 3: Time travel - Game component manages history and jumps back in time
+export default function Game() {
+  const [history, setHistory] = useState<SquareValue[][]>([Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState<number>(0);
+  const xIsNext = currentMove % 2 === 0;
+  const currentSquares = history[currentMove];
+
+  function handlePlay(nextSquares: SquareValue[]) {
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
+  }
+
+  function jumpTo(nextMove: number) {
+    setCurrentMove(nextMove);
+  }
+
+  const moves = history.map((squares, move) => {
+    let description: string;
+    if (move > 0) {
+      description = "Go to move #" + move;
+    } else {
+      description = "Go to game start";
+    }
+
+    return (
+      <Pressable
+        key={move}
+        style={styles.moveButton}
+        onPress={() => jumpTo(move)}
+      >
+        <Text style={styles.moveButtonText}>{description}</Text>
+      </Pressable>
+    );
+  });
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Tic-Tac-Toe</Text>
+
+      <View style={styles.gameBoard}>
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+      </View>
+
+      <View style={styles.gameInfo}>
+        <Text style={styles.historyTitle}>History</Text>
+        <ScrollView style={styles.historyList}>
+          {moves}
+        </ScrollView>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8fafc",
     alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
+    paddingTop: 50,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 16,
+    marginBottom: 12,
     color: "#0f172a",
+  },
+  boardContainer: {
+    alignItems: "center",
   },
   status: {
     fontSize: 20,
     fontWeight: "600",
-    marginBottom: 20,
+    marginBottom: 16,
     color: "#334155",
   },
   boardRow: {
@@ -139,6 +194,38 @@ const styles = StyleSheet.create({
   squareText: {
     fontSize: 36,
     fontWeight: "bold",
+    color: "#1e293b",
+  },
+  gameBoard: {
+    marginBottom: 20,
+  },
+  gameInfo: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 320,
+    marginTop: 10,
+  },
+  historyTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "#0f172a",
+    textAlign: "center",
+  },
+  historyList: {
+    flex: 1,
+  },
+  moveButton: {
+    backgroundColor: "#e2e8f0",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginVertical: 4,
+    alignItems: "center",
+  },
+  moveButtonText: {
+    fontSize: 15,
+    fontWeight: "500",
     color: "#1e293b",
   },
 });
