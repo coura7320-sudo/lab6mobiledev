@@ -37,7 +37,7 @@ function Square({ value, onSquareClick, isWinningSquare }: SquareProps) {
   );
 }
 
-// Improvement 4: Helper function returns winner and the 3 winning square indices
+// Helper function to calculate the winner and return the 3 winning squares
 function calculateWinner(squares: SquareValue[]): WinnerResult | null {
   const lines = [
     [0, 1, 2], // rows
@@ -87,7 +87,7 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
   const winnerInfo = calculateWinner(squares);
   const winner = winnerInfo ? winnerInfo.winner : null;
   const winningLine = winnerInfo ? winnerInfo.line : null;
-  // Improvement 4: Check if game is a draw (all squares filled and no winner)
+  // Improvement 4: Draw detection
   const isDraw = !winner && squares.every((square) => square !== null);
 
   let status: string;
@@ -99,7 +99,7 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
-  // Improvement 2: Rewrite Board to use two loops
+  // Improvement 2: Two loops dynamically render the 3x3 board
   const boardRows = [];
   for (let row = 0; row < 3; row++) {
     const rowSquares = [];
@@ -134,7 +134,7 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
 export default function Game() {
   const [history, setHistory] = useState<SquareValue[][]>([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState<number>(0);
-  // Improvement 3: Toggle state to sort moves ascending or descending
+  // Improvement 3: Toggle sort order
   const [isAscending, setIsAscending] = useState<boolean>(true);
 
   const xIsNext = currentMove % 2 === 0;
@@ -150,11 +150,32 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
-  // Improvement 1: For the current move only, show "You are at move #..." instead of a button
+  // Improvement 5: Calculate (row, col) location for each move
+  function getMoveLocation(moveIndex: number): { row: number; col: number } | null {
+    if (moveIndex === 0) return null;
+    const current = history[moveIndex];
+    const previous = history[moveIndex - 1];
+    for (let i = 0; i < 9; i++) {
+      if (current[i] !== previous[i]) {
+        return {
+          row: Math.floor(i / 3) + 1,
+          col: (i % 3) + 1,
+        };
+      }
+    }
+    return null;
+  }
+
+  // Improvement 1: Show text for current move instead of button
   const moves = history.map((squares, move) => {
+    const location = getMoveLocation(move);
+    const locationText = location ? ` (${location.row}, ${location.col})` : "";
+
     if (move === currentMove) {
       const currentText =
-        move > 0 ? `You are at move #${move}` : "You are at game start";
+        move > 0
+          ? `You are at move #${move}${locationText}`
+          : "You are at game start";
       return (
         <View key={move} style={styles.currentMoveContainer}>
           <Text style={styles.currentMoveText}>{currentText}</Text>
@@ -162,7 +183,11 @@ export default function Game() {
       );
     }
 
-    const description = move > 0 ? "Go to move #" + move : "Go to game start";
+    const description =
+      move > 0
+        ? `Go to move #${move}${locationText}`
+        : "Go to game start";
+
     return (
       <Pressable
         key={move}
