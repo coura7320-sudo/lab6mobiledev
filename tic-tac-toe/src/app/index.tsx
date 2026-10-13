@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { StyleSheet, View, Text, Pressable, ScrollView } from "react-native";
 
 // Type definition for a square value: "X", "O", or null (empty)
