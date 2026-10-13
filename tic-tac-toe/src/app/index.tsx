@@ -107,6 +107,9 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
 export default function Game() {
   const [history, setHistory] = useState<SquareValue[][]>([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState<number>(0);
+  // Improvement 3: Toggle state to sort moves ascending or descending
+  const [isAscending, setIsAscending] = useState<boolean>(true);
+
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
@@ -144,6 +147,9 @@ export default function Game() {
     );
   });
 
+  // Improvement 3: Conditionally display moves ascending or descending
+  const displayedMoves = isAscending ? moves : moves.slice().reverse();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tic-Tac-Toe</Text>
@@ -153,8 +159,18 @@ export default function Game() {
       </View>
 
       <View style={styles.gameInfo}>
-        <Text style={styles.historyTitle}>History</Text>
-        <ScrollView style={styles.historyList}>{moves}</ScrollView>
+        <View style={styles.historyHeader}>
+          <Text style={styles.historyTitle}>History</Text>
+          <Pressable
+            style={styles.sortButton}
+            onPress={() => setIsAscending(!isAscending)}
+          >
+            <Text style={styles.sortButtonText}>
+              {isAscending ? "Sort: Ascending" : "Sort: Descending"}
+            </Text>
+          </Pressable>
+        </View>
+        <ScrollView style={styles.historyList}>{displayedMoves}</ScrollView>
       </View>
     </View>
   );
@@ -209,12 +225,27 @@ const styles = StyleSheet.create({
     maxWidth: 320,
     marginTop: 10,
   },
+  historyHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
   historyTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
     color: "#0f172a",
-    textAlign: "center",
+  },
+  sortButton: {
+    backgroundColor: "#0284c7",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  sortButtonText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontWeight: "600",
   },
   historyList: {
     flex: 1,
