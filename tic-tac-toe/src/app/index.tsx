@@ -102,7 +102,7 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
   );
 }
 
-// Checkpoint 3: Time travel - Game component manages history and jumps back in time
+// Game component
 export default function Game() {
   const [history, setHistory] = useState<SquareValue[][]>([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState<number>(0);
@@ -119,14 +119,19 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
+  // Improvement 1: For the current move only, show "You are at move #..." instead of a button
   const moves = history.map((squares, move) => {
-    let description: string;
-    if (move > 0) {
-      description = "Go to move #" + move;
-    } else {
-      description = "Go to game start";
+    if (move === currentMove) {
+      const currentText =
+        move > 0 ? `You are at move #${move}` : "You are at game start";
+      return (
+        <View key={move} style={styles.currentMoveContainer}>
+          <Text style={styles.currentMoveText}>{currentText}</Text>
+        </View>
+      );
     }
 
+    const description = move > 0 ? "Go to move #" + move : "Go to game start";
     return (
       <Pressable
         key={move}
@@ -148,9 +153,7 @@ export default function Game() {
 
       <View style={styles.gameInfo}>
         <Text style={styles.historyTitle}>History</Text>
-        <ScrollView style={styles.historyList}>
-          {moves}
-        </ScrollView>
+        <ScrollView style={styles.historyList}>{moves}</ScrollView>
       </View>
     </View>
   );
@@ -227,5 +230,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "500",
     color: "#1e293b",
+  },
+  currentMoveContainer: {
+    backgroundColor: "#3b82f6",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginVertical: 4,
+    alignItems: "center",
+  },
+  currentMoveText: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#ffffff",
   },
 });
