@@ -1,56 +1,77 @@
-# Welcome to your Expo app 👋
+# Lab 6 — Tic-Tac-Toe in React Native
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An interactive Tic-Tac-Toe mobile game built with **React Native** and **Expo**, following the official [React Tic-Tac-Toe Tutorial](https://react.dev/learn/tutorial-tic-tac-toe) and adapted for mobile devices.
 
-## Get started
+---
 
-1. Install dependencies
+## 📱 Features
 
+- **3 × 3 Grid**: Clean and responsive grid built with native components.
+- **Turn-based Gameplay**: Alternates between Player `X` and Player `O`.
+- **Game State Validation**: Prevents overwriting already occupied squares.
+- **Winner Detection**: Automatically detects horizontal, vertical, and diagonal winning lines.
+- **Time Travel History**: Browse through previous game states and jump back to any move.
+- **5 Improvements Implemented**:
+  1. **Current Move Highlight**: Displays *"You are at move #..."* as text instead of a clickable button for the active step.
+  2. **Two Loops Board Rendering**: Board grid is generated dynamically using two nested loops rather than hardcoded elements.
+  3. **History Sorting**: Toggle button allowing players to sort move history in ascending or descending order.
+  4. **Winning Line Highlight & Draw Status**: Highlights the 3 winning squares in green when a player wins, and displays *"Result: It's a draw!"* when all squares are filled without a winner.
+  5. **Move Location Coordinates**: Shows coordinates in `(row, col)` format for each step in the move history list.
+
+---
+
+## 🔄 React Web vs. React Native Translation
+
+| React (Web) | React Native | Description |
+|---|---|---|
+| `<div>` | `<View>` | Layout container |
+| `<button onClick={...}>` | `<Pressable onPress={...}>` | Touch interaction element |
+| Plain text inside tags | `<Text>` | All text must be explicitly wrapped |
+| `className` + CSS | `StyleSheet.create` | Scoped and performant mobile styles |
+| `<ol>` / `<li>` | `<ScrollView>` + `<Pressable>` | Scrollable move history list |
+| JavaScript | TypeScript | Type safety (`type SquareValue = "X" \| "O" \| null`) |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- [Expo Go](https://expo.dev/go) app installed on your iOS or Android device
+
+### Installation & Run
+
+1. Navigate to the project directory:
+   ```bash
+   cd tic-tac-toe
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. Start the Expo development server:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. Scan the QR code with:
+   - **Expo Go** on Android
+   - The **Camera** app on iOS
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📌 Checkpoints & Git History
 
-## Get a fresh project
+The project follows the checkpoints outlined in the lab instructions:
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. `Board of nine squares` — Displays a 3 × 3 board of `Square` components.
+2. `Playable game with a winner` — Full game logic with turn taking, no overwriting, and winner announcement.
+3. `Time travel` — Game state history management with time travel and computed `xIsNext`.
+4. `Improvement: Show current move as text instead of button` — Distinguishes current move from clickable buttons.
+5. `Improvement: Rewrite Board to use two loops to make squares` — Generates board dynamically using nested loops.
+6. `Improvement: Add toggle button to sort moves in ascending or descending order` — Adds order toggle for move history.
+7. `Improvement: Highlight winning squares and display draw message` — Visually highlights winning squares and handles stalemates.
+8. `Improvement: Display location (row, col) for each move in history` — Computes and displays move coordinates.
