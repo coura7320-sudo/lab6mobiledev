@@ -74,30 +74,31 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
+  // Improvement 2: Rewrite Board to use two loops to make the squares dynamically
+  const boardRows = [];
+  for (let row = 0; row < 3; row++) {
+    const rowSquares = [];
+    for (let col = 0; col < 3; col++) {
+      const squareIndex = row * 3 + col;
+      rowSquares.push(
+        <Square
+          key={squareIndex}
+          value={squares[squareIndex]}
+          onSquareClick={() => handleClick(squareIndex)}
+        />
+      );
+    }
+    boardRows.push(
+      <View key={row} style={styles.boardRow}>
+        {rowSquares}
+      </View>
+    );
+  }
+
   return (
     <View style={styles.boardContainer}>
       <Text style={styles.status}>{status}</Text>
-
-      {/* Row 1 */}
-      <View style={styles.boardRow}>
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-      </View>
-
-      {/* Row 2 */}
-      <View style={styles.boardRow}>
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </View>
-
-      {/* Row 3 */}
-      <View style={styles.boardRow}>
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </View>
+      {boardRows}
     </View>
   );
 }
