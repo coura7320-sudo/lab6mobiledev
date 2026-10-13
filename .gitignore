@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Expo
+.expo/
+**/.expo/
+dist/
+web-build/
+expo-env.d.ts
+**/expo-env.d.ts
+
+# Nested duplicate folder
+tic-tac-toe/tic-tac-toe/
+
+# Native
+/ios
+/android
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Local environment
+.env*.local
