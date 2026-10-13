@@ -4,23 +4,41 @@ import { StyleSheet, View, Text, Pressable, ScrollView } from "react-native";
 // Type definition for a square value: "X", "O", or null (empty)
 type SquareValue = "X" | "O" | null;
 
+// Return type for winner calculation
+interface WinnerResult {
+  winner: SquareValue;
+  line: number[] | null;
+}
+
 // Props for Square
 interface SquareProps {
   value: SquareValue;
   onSquareClick: () => void;
+  // Improvement 4: Highlight winning square
+  isWinningSquare?: boolean;
 }
 
 // Beginner-friendly Square component
-function Square({ value, onSquareClick }: SquareProps) {
+function Square({ value, onSquareClick, isWinningSquare }: SquareProps) {
   return (
-    <Pressable style={styles.square} onPress={onSquareClick}>
-      <Text style={styles.squareText}>{value}</Text>
+    <Pressable
+      style={[styles.square, isWinningSquare && styles.winningSquare]}
+      onPress={onSquareClick}
+    >
+      <Text
+        style={[
+          styles.squareText,
+          isWinningSquare && styles.winningSquareText,
+        ]}
+      >
+        {value}
+      </Text>
     </Pressable>
   );
 }
 
-// Helper function to calculate the winner
-function calculateWinner(squares: SquareValue[]): SquareValue {
+// Improvement 4: Helper function returns winner and the 3 winning square indices
+function calculateWinner(squares: SquareValue[]): WinnerResult | null {
   const lines = [
     [0, 1, 2], // rows
     [3, 4, 5],
@@ -35,7 +53,7 @@ function calculateWinner(squares: SquareValue[]): SquareValue {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return { winner: squares[a], line: lines[i] };
     }
   }
 
@@ -66,25 +84,34 @@ function Board({ xIsNext, squares, onPlay }: BoardProps) {
     onPlay(nextSquares);
   }
 
-  const winner = calculateWinner(squares);
+  const winnerInfo = calculateWinner(squares);
+  const winner = winnerInfo ? winnerInfo.winner : null;
+  const winningLine = winnerInfo ? winnerInfo.line : null;
+  // Improvement 4: Check if game is a draw (all squares filled and no winner)
+  const isDraw = !winner && squares.every((square) => square !== null);
+
   let status: string;
   if (winner) {
     status = "Winner: " + winner;
+  } else if (isDraw) {
+    status = "Result: It's a draw!";
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
-  // Improvement 2: Rewrite Board to use two loops to make the squares dynamically
+  // Improvement 2: Rewrite Board to use two loops
   const boardRows = [];
   for (let row = 0; row < 3; row++) {
     const rowSquares = [];
     for (let col = 0; col < 3; col++) {
       const squareIndex = row * 3 + col;
+      const isWinning = winningLine ? winningLine.includes(squareIndex) : false;
       rowSquares.push(
         <Square
           key={squareIndex}
           value={squares[squareIndex]}
           onSquareClick={() => handleClick(squareIndex)}
+          isWinningSquare={isWinning}
         />
       );
     }
@@ -215,6 +242,13 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: "bold",
     color: "#1e293b",
+  },
+  winningSquare: {
+    backgroundColor: "#bbf7d0",
+    borderColor: "#16a34a",
+  },
+  winningSquareText: {
+    color: "#15803d",
   },
   gameBoard: {
     marginBottom: 20,
